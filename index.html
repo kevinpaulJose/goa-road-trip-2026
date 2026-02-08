@@ -437,7 +437,7 @@
                     </div>
                 </div>
 
-                <div class="timeline-item" data-lat="12.8698" data-lng="74.8400" data-title="Hotel - RKS Beachfront">
+                <div class="timeline-item" data-lat="12.8421" data-lng="74.8357" data-title="Hotel - RKS Beachfront">
                     <div class="time">11:00 PM</div>
                     <div class="event">
                         <div class="event-title"><span class="checkpoint stay"></span> ✅ Check-in: RKS Beachfront</div>
@@ -596,7 +596,7 @@
                     </div>
                 </div>
 
-                <div class="timeline-item" data-lat="15.6400" data-lng="73.7350" data-title="Hotel - Montego Bay Beach Village">
+                <div class="timeline-item" data-lat="15.6312" data-lng="73.7378" data-title="Hotel - Montego Bay Beach Village">
                     <div class="time">4:30 PM</div>
                     <div class="event">
                         <div class="event-title"><span class="checkpoint stay"></span> ✅ Check-in: Montego Bay Beach Village, Morjim</div>
@@ -852,6 +852,43 @@
         let directionsService;
         let directionsRenderer;
 
+        // ============================================
+        // BOOKED LOCATIONS - Update as bookings come in
+        // ============================================
+        const TRIP_CONFIG = {
+            origin: { lat: 11.0168, lng: 76.9558, name: "Coimbatore", icon: "🏠" },
+            destination: { lat: 11.0168, lng: 76.9558, name: "Coimbatore", icon: "🏠" },
+            stays: [
+                {
+                    name: "RKS Beachfront",
+                    location: "RKS Beachfront, Fisheries Rd, Mangalore",
+                    lat: 12.8421,
+                    lng: 74.8357,
+                    dates: "Feb 12-14",
+                    amount: "₹9,981",
+                    icon: "🏨",
+                    day: 1,
+                    mapUrl: "https://maps.app.goo.gl/Q9cFi3HMc9fPuTfU6",
+                    booked: true
+                },
+                {
+                    name: "Montego Bay Beach Village",
+                    location: "Montego Bay Beach Village, Morjim, Goa",
+                    lat: 15.6312,
+                    lng: 73.7378,
+                    dates: "Feb 14-16",
+                    amount: "₹22,283",
+                    icon: "🏨",
+                    day: 3,
+                    mapUrl: "https://maps.app.goo.gl/2Q7sKCvadVTCyNjdA",
+                    booked: true
+                }
+            ],
+            optionalStops: [
+                { lat: 14.5479, lng: 74.3188, name: "Gokarna", icon: "🏖️", day: 3, optional: true }
+            ]
+        };
+
         function initMap() {
             map = new google.maps.Map(document.getElementById("map"), {
                 center: { lat: 13.5, lng: 75.5 },
@@ -875,7 +912,7 @@
                 }
             });
 
-            // Add route
+            // Add route using booked locations
             showFullRoute();
 
             // Add markers for all waypoints
@@ -916,18 +953,18 @@
         }
 
         function showFullRoute() {
-            const waypoints = [
-                { location: "Mangalore, Karnataka" },
-                { location: "Gokarna, Karnataka" },
-            ];
+            // Build waypoints from booked stays
+            const waypoints = TRIP_CONFIG.stays
+                .filter(stay => stay.booked)
+                .map(stay => ({
+                    location: { lat: stay.lat, lng: stay.lng },
+                    stopover: true
+                }));
 
             directionsService.route({
-                origin: "Coimbatore, Tamil Nadu",
-                destination: "Coimbatore, Tamil Nadu",
-                waypoints: [
-                    { location: "Mangalore, Karnataka", stopover: true },
-                    { location: "Goa, India", stopover: true },
-                ],
+                origin: { lat: TRIP_CONFIG.origin.lat, lng: TRIP_CONFIG.origin.lng },
+                destination: { lat: TRIP_CONFIG.destination.lat, lng: TRIP_CONFIG.destination.lng },
+                waypoints: waypoints,
                 travelMode: google.maps.TravelMode.DRIVING
             }, (result, status) => {
                 if (status === "OK") {
@@ -937,34 +974,57 @@
         }
 
         function addWaypoints() {
-            const locations = [
-                { lat: 11.0168, lng: 76.9558, title: "Coimbatore", icon: "🏠", day: 1 },
-                { lat: 12.8698, lng: 74.8430, title: "Mangalore", icon: "🏨", day: 2 },
-                { lat: 14.5479, lng: 74.3188, title: "Gokarna", icon: "🏖️", day: 3 },
-                { lat: 15.6130, lng: 73.7496, title: "Goa", icon: "🎉", day: 3 },
-            ];
+            // Add origin marker
+            addMarker(TRIP_CONFIG.origin.lat, TRIP_CONFIG.origin.lng, TRIP_CONFIG.origin.name, TRIP_CONFIG.origin.icon, "Start/End", null);
 
-            locations.forEach(loc => {
-                const marker = new google.maps.Marker({
-                    position: { lat: loc.lat, lng: loc.lng },
-                    map: map,
-                    title: loc.title,
-                    label: {
-                        text: loc.icon,
-                        fontSize: "24px"
-                    }
-                });
+            // Add booked stay markers
+            TRIP_CONFIG.stays.forEach(stay => {
+                if (stay.booked) {
+                    const info = `<div class="info-window">
+                        <h4>${stay.icon} ${stay.name}</h4>
+                        <p><strong>${stay.dates}</strong></p>
+                        <p style="color: #4ade80">${stay.amount} ✅</p>
+                        <a href="${stay.mapUrl}" target="_blank" style="color: #667eea">Open in Maps</a>
+                    </div>`;
+                    addMarker(stay.lat, stay.lng, stay.name, stay.icon, info, true);
+                }
+            });
 
+            // Add optional stops (dimmed)
+            TRIP_CONFIG.optionalStops.forEach(stop => {
+                const info = `<div class="info-window">
+                    <h4>${stop.icon} ${stop.name}</h4>
+                    <p>Day ${stop.day} - Optional Stop</p>
+                </div>`;
+                addMarker(stop.lat, stop.lng, stop.name, stop.icon, info, false);
+            });
+        }
+
+        function addMarker(lat, lng, title, icon, infoContent, isBooked) {
+            const marker = new google.maps.Marker({
+                position: { lat, lng },
+                map: map,
+                title: title,
+                label: {
+                    text: icon,
+                    fontSize: "24px"
+                },
+                opacity: isBooked === false ? 0.5 : 1
+            });
+
+            if (infoContent) {
                 const infoWindow = new google.maps.InfoWindow({
-                    content: `<div class="info-window"><h4>${loc.icon} ${loc.title}</h4><p>Day ${loc.day}</p></div>`
+                    content: typeof infoContent === 'string' && infoContent.includes('<') 
+                        ? infoContent 
+                        : `<div class="info-window"><h4>${icon} ${title}</h4><p>${infoContent}</p></div>`
                 });
 
                 marker.addListener('click', () => {
                     infoWindow.open(map, marker);
                 });
+            }
 
-                markers.push(marker);
-            });
+            markers.push(marker);
         }
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7R2B6AtIvPySj3QWUk_SO0_bpwZkLZAo&callback=initMap"></script>
