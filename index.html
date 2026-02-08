@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗 Goa Road Trip - Feb 13-17, 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 200px);
+        }
+
+        .map-container {
+            flex: 1;
+            min-height: 500px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .timeline-container {
+            width: 500px;
+            max-width: 100%;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .day-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .day-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .day-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+
+        .day-info h3 {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .day-info p {
+            font-size: 0.85em;
+            opacity: 0.7;
+        }
+
+        .day-badge {
+            background: #ff6b6b;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            margin-left: auto;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .timeline-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .timeline-item.active {
+            background: rgba(102, 126, 234, 0.3);
+            border: 1px solid #667eea;
+        }
+
+        .time {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #667eea;
+            min-width: 60px;
+        }
+
+        .event {
+            flex: 1;
+        }
+
+        .event-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .event-desc {
+            font-size: 0.85em;
+            opacity: 0.7;
+        }
+
+        .event-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .event-link {
+            font-size: 0.75em;
+            padding: 4px 10px;
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            color: #a5b4fc;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .event-link:hover {
+            background: rgba(102, 126, 234, 0.5);
+        }
+
+        .rating {
+            color: #fbbf24;
+            font-size: 0.8em;
+        }
+
+        .price {
+            color: #4ade80;
+            font-size: 0.8em;
+        }
+
+        .checkpoint {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .checkpoint.drive { background: #60a5fa; }
+        .checkpoint.food { background: #f97316; }
+        .checkpoint.stay { background: #a855f7; }
+        .checkpoint.visit { background: #22c55e; }
+        .checkpoint.activity { background: #ec4899; }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85em;
+        }
+
+        .budget-card {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .budget-card h3 {
+            margin-bottom: 15px;
+        }
+
+        .budget-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .budget-total {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+
+        .checklist {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .checklist h3 {
+            margin-bottom: 15px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .check-item input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .check-item.checked label {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            .map-container {
+                position: relative;
+                height: 400px;
+            }
+            .timeline-container {
+                width: 100%;
+                max-height: none;
+            }
+        }
+
+        .route-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            text-decoration: none;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .route-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .info-window {
+            color: #333;
+            max-width: 250px;
+        }
+
+        .info-window h4 {
+            margin-bottom: 5px;
+            color: #667eea;
+        }
+
+        .info-window p {
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .info-window a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚗 Coimbatore → Goa Road Trip</h1>
+        <p>February 13-17, 2026 | Kevin & Joanna</p>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value">1,580 km</div>
+                <div class="stat-label">Total Distance</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">5 Days</div>
+                <div class="stat-label">Duration</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">₹36,000</div>
+                <div class="stat-label">Est. Budget</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">4 Cities</div>
+                <div class="stat-label">Destinations</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="map" class="map-container"></div>
+        
+        <div class="timeline-container">
+            <div class="legend">
+                <div class="legend-item"><span class="checkpoint drive"></span> Drive</div>
+                <div class="legend-item"><span class="checkpoint food"></span> Food</div>
+                <div class="legend-item"><span class="checkpoint stay"></span> Stay</div>
+                <div class="legend-item"><span class="checkpoint visit"></span> Visit</div>
+                <div class="legend-item"><span class="checkpoint activity"></span> Activity</div>
+            </div>
+
+            <!-- Day 1 -->
+            <div class="day-card" data-day="1">
+                <div class="day-header">
+                    <div class="day-number">1</div>
+                    <div class="day-info">
+                        <h3>Thursday, Feb 13</h3>
+                        <p>Coimbatore → Mangalore (420 km)</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item" data-lat="11.0168" data-lng="76.9558" data-title="Start - Coimbatore">
+                    <div class="time">2:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint drive"></span> Leave Coimbatore</div>
+                        <div class="event-desc">Full tank, check tyres, start journey</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="10.7867" data-lng="76.6548" data-title="Palakkad">
+                    <div class="time">3:30 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint drive"></span> Cross Palakkad</div>
+                        <div class="event-desc">Enter Kerala</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="11.0510" data-lng="76.0711" data-title="Tea Break">
+                    <div class="time">4:30 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> Tea Break</div>
+                        <div class="event-desc">Malappuram area - 15 min stop</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.8700" data-lng="74.8430" data-title="Dinner - Sana-di-ge">
+                    <div class="time">8:30 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> Dinner - Sana-di-ge</div>
+                        <div class="event-desc">Coastal seafood restaurant <span class="rating">⭐ 4.4</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Sana-di-ge+Mangalore" target="_blank" class="event-link">📍 Maps</a>
+                            <a href="https://www.zomato.com/mangalore/sana-di-ge" target="_blank" class="event-link">🍽️ Zomato</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.8698" data-lng="74.8400" data-title="Hotel - Seashore Villa">
+                    <div class="time">11:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint stay"></span> Check-in: Seashore Villa</div>
+                        <div class="event-desc"><span class="rating">⭐ 4.9</span> <span class="price">₹2,500-3,500/night</span></div>
+                        <div class="event-links">
+                            <a href="https://www.google.com/travel/hotels/seashore%20villa%20mangalore" target="_blank" class="event-link">🏨 Book</a>
+                            <a href="https://maps.google.com/?q=Seashore+Villa+Mangalore" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="https://www.google.com/maps/dir/Coimbatore/Mangalore" target="_blank" class="route-btn">
+                    🗺️ Open Route in Google Maps
+                </a>
+            </div>
+
+            <!-- Day 2 -->
+            <div class="day-card" data-day="2">
+                <div class="day-header">
+                    <div class="day-number">2</div>
+                    <div class="day-info">
+                        <h3>Friday, Feb 14</h3>
+                        <p>Explore Mangalore</p>
+                    </div>
+                    <div class="day-badge">💕 Valentine's Day</div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.8698" data-lng="74.8426" data-title="Breakfast - Hotel Narayana">
+                    <div class="time">8:30 AM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> Breakfast - Hotel Narayana</div>
+                        <div class="event-desc">Mangalore Buns, Neer Dosa <span class="rating">⭐ 4.3 (6k reviews)</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Hotel+Narayana+Mangalore" target="_blank" class="event-link">📍 Maps</a>
+                            <a href="https://www.zomato.com/mangalore/hotel-narayana" target="_blank" class="event-link">🍽️ Zomato</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.8785" data-lng="74.8527" data-title="Kadri Manjunatha Temple">
+                    <div class="time">10:00 AM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint visit"></span> Kadri Manjunatha Temple</div>
+                        <div class="event-desc">Ancient 10th century temple <span class="rating">⭐ 4.8 (14k reviews)</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Kadri+Manjunatha+Temple" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.8697" data-lng="74.8431" data-title="St. Aloysius Chapel">
+                    <div class="time">11:30 AM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint visit"></span> St. Aloysius Chapel</div>
+                        <div class="event-desc">Stunning ceiling paintings <span class="rating">⭐ 4.6</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=St+Aloysius+Chapel+Mangalore" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.8755" data-lng="74.8363" data-title="Lunch - Machali">
+                    <div class="time">1:30 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> 🔥 Lunch - Machali (MUST VISIT!)</div>
+                        <div class="event-desc">Kane Fry, Prawn Ghee Roast <span class="rating">⭐ 4.4 (24k reviews)</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Machali+Mangalore" target="_blank" class="event-link">📍 Maps</a>
+                            <a href="https://www.zomato.com/mangalore/machali-kodailbail" target="_blank" class="event-link">🍽️ Zomato</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.9141" data-lng="74.8560" data-title="Pilikula Nisargadhama">
+                    <div class="time">3:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint activity"></span> Pilikula Nisargadhama</div>
+                        <div class="event-desc">Zoo, Science Centre, Boating <span class="rating">⭐ 4.3</span> <span class="price">₹50-100</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Pilikula+Nisargadhama" target="_blank" class="event-link">📍 Maps</a>
+                            <a href="https://pilikula.com/" target="_blank" class="event-link">🎟️ Tickets</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.9365" data-lng="74.7963" data-title="Panambur Beach">
+                    <div class="time">6:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint activity"></span> 🌅 Sunset - Panambur Beach</div>
+                        <div class="event-desc">Beautiful sunset, water sports</div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Panambur+Beach" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.8700" data-lng="74.8430" data-title="Valentine's Dinner - GiriManja's">
+                    <div class="time">8:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> ❤️ Valentine's Dinner - GiriManja's</div>
+                        <div class="event-desc">Iconic seafood! Fish Thali <span class="rating">⭐ 4.5 (8.6k reviews)</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=GiriManjas+Mangalore" target="_blank" class="event-link">📍 Maps</a>
+                            <a href="https://www.zomato.com/mangalore/girimanjas-bunder" target="_blank" class="event-link">🍽️ Reserve</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 3 -->
+            <div class="day-card" data-day="3">
+                <div class="day-header">
+                    <div class="day-number">3</div>
+                    <div class="day-info">
+                        <h3>Saturday, Feb 15</h3>
+                        <p>Mangalore → Goa (343 km)</p>
+                    </div>
+                    <div class="day-badge">🎂 Joanna's Birthday!</div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.8698" data-lng="74.8400" data-title="Leave Mangalore">
+                    <div class="time">8:00 AM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint drive"></span> Leave Mangalore</div>
+                        <div class="event-desc">Checkout, start drive to Goa</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="14.5479" data-lng="74.3188" data-title="Gokarna - Om Beach">
+                    <div class="time">12:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint activity"></span> Optional: Gokarna - Om Beach</div>
+                        <div class="event-desc">Beautiful Om-shaped beach <span class="rating">⭐ 4.6</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Om+Beach+Gokarna" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="14.5500" data-lng="74.3180" data-title="Lunch - Namaste Cafe">
+                    <div class="time">1:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> Lunch - Namaste Cafe, Gokarna</div>
+                        <div class="event-desc">Beach view, hippie vibe <span class="rating">⭐ 4.3</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Namaste+Cafe+Gokarna" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.6130" data-lng="73.7496" data-title="Arrive Goa">
+                    <div class="time">4:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint drive"></span> 🎉 Enter Goa!</div>
+                        <div class="event-desc">Welcome to Goa!</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.6400" data-lng="73.7350" data-title="Hotel - Tan N Sand">
+                    <div class="time">4:30 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint stay"></span> Check-in: Tan N Sand, Ashwem</div>
+                        <div class="event-desc"><span class="rating">⭐ 4.6 (1.6k reviews)</span> <span class="price">₹4,000-6,000/night</span></div>
+                        <div class="event-links">
+                            <a href="https://www.booking.com/searchresults.html?ss=Tan+N+Sand+Ashwem+Goa" target="_blank" class="event-link">🏨 Book</a>
+                            <a href="https://maps.google.com/?q=Tan+N+Sand+Ashwem+Goa" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.5970" data-lng="73.7450" data-title="Birthday Dinner - Thalassa">
+                    <div class="time">8:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> 🎂 Birthday Dinner - Thalassa</div>
+                        <div class="event-desc">Greek food, cliff view! <span class="rating">⭐ 4.5</span> 📞 +91 832 227 4835</div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Thalassa+Goa" target="_blank" class="event-link">📍 Maps</a>
+                            <a href="https://www.zomato.com/goa/thalassa-vagator" target="_blank" class="event-link">🍽️ Reserve</a>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="https://www.google.com/maps/dir/Mangalore/Goa" target="_blank" class="route-btn">
+                    🗺️ Open Route in Google Maps
+                </a>
+            </div>
+
+            <!-- Day 4 -->
+            <div class="day-card" data-day="4">
+                <div class="day-header">
+                    <div class="day-number">4</div>
+                    <div class="day-info">
+                        <h3>Sunday, Feb 16</h3>
+                        <p>Explore North Goa</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.5800" data-lng="73.7700" data-title="Breakfast - Artjuna Cafe">
+                    <div class="time">9:00 AM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> Breakfast - Artjuna Garden Cafe</div>
+                        <div class="event-desc">Organic, healthy <span class="rating">⭐ 4.5</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Artjuna+Garden+Cafe+Anjuna" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.4920" data-lng="73.7730" data-title="Fort Aguada">
+                    <div class="time">10:30 AM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint visit"></span> Fort Aguada</div>
+                        <div class="event-desc">17th century Portuguese fort <span class="rating">⭐ 4.2 (108k reviews!)</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Fort+Aguada+Goa" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.5130" data-lng="73.7620" data-title="Lunch - Mikey's Place">
+                    <div class="time">1:30 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> 🔥 Lunch - Mikey's Place (MUST!)</div>
+                        <div class="event-desc">Goan Fish Curry Rice <span class="rating">⭐ 4.8 (18k reviews)</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Mikeys+Place+Candolim" target="_blank" class="event-link">📍 Maps</a>
+                            <a href="https://www.zomato.com/goa/mikeys-place-candolim" target="_blank" class="event-link">🍽️ Zomato</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.6070" data-lng="73.7380" data-title="Chapora Fort">
+                    <div class="time">3:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint visit"></span> Chapora Fort (Dil Chahta Hai!)</div>
+                        <div class="event-desc">Iconic views, great for photos! <span class="rating">⭐ 4.2 (25k reviews)</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Chapora+Fort+Goa" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.5930" data-lng="73.7490" data-title="Curlies Beach Shack">
+                    <div class="time">5:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint activity"></span> 🍺 Curlies Beach Shack</div>
+                        <div class="event-desc">Beer, nachos, sunset vibes!</div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Curlies+Anjuna+Goa" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.5200" data-lng="73.7600" data-title="Dinner - Deck 88">
+                    <div class="time">8:30 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> Dinner - Deck 88</div>
+                        <div class="event-desc">Fine dining, romantic <span class="rating">⭐ 4.9</span></div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Deck+88+Goa" target="_blank" class="event-link">📍 Maps</a>
+                            <a href="https://www.zomato.com/goa/deck-88-candolim" target="_blank" class="event-link">🍽️ Reserve</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.5550" data-lng="73.7530" data-title="Tito's Lane">
+                    <div class="time">10:30 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint activity"></span> 🎉 Nightlife - Tito's Lane (Optional)</div>
+                        <div class="event-desc">Famous party street!</div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Titos+Lane+Baga+Goa" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 5 -->
+            <div class="day-card" data-day="5">
+                <div class="day-header">
+                    <div class="day-number">5</div>
+                    <div class="day-info">
+                        <h3>Monday, Feb 17</h3>
+                        <p>Goa → Coimbatore (817 km)</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.6400" data-lng="73.7350" data-title="Leave Goa">
+                    <div class="time">6:00 AM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint drive"></span> Leave Goa (Early start!)</div>
+                        <div class="event-desc">Long drive ahead - 16 hours</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="15.3647" data-lng="75.1240" data-title="Breakfast - Hubli">
+                    <div class="time">8:30 AM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> Breakfast - Kamat Restaurant, Hubli</div>
+                        <div class="event-desc">South Indian, quick service</div>
+                        <div class="event-links">
+                            <a href="https://maps.google.com/?q=Kamat+Restaurant+Hubli" target="_blank" class="event-link">📍 Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="14.2226" data-lng="76.3987" data-title="Lunch - Chitradurga">
+                    <div class="time">12:30 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> Lunch - Chitradurga</div>
+                        <div class="event-desc">Try Davangere Benne Dosa! 🥞</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="12.2958" data-lng="76.6394" data-title="Tea Break - Mysore">
+                    <div class="time">4:30 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint food"></span> Tea Break - Mysore Bypass</div>
+                        <div class="event-desc">Stretch, refresh - 20 min</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" data-lat="11.0168" data-lng="76.9558" data-title="Arrive Coimbatore">
+                    <div class="time">9:00 PM</div>
+                    <div class="event">
+                        <div class="event-title"><span class="checkpoint drive"></span> 🏠 Arrive Coimbatore!</div>
+                        <div class="event-desc">Home sweet home! Trip complete! 🎉</div>
+                    </div>
+                </div>
+
+                <a href="https://www.google.com/maps/dir/Goa/Coimbatore" target="_blank" class="route-btn">
+                    🗺️ Open Route in Google Maps
+                </a>
+            </div>
+
+            <!-- Budget Card -->
+            <div class="budget-card">
+                <h3>💰 Budget Summary</h3>
+                <div class="budget-item">
+                    <span>⛽ Fuel (1,580 km)</span>
+                    <span>₹7,270</span>
+                </div>
+                <div class="budget-item">
+                    <span>🛣️ Tolls</span>
+                    <span>₹1,800</span>
+                </div>
+                <div class="budget-item">
+                    <span>🏨 Mangalore (2 nights)</span>
+                    <span>₹6,000</span>
+                </div>
+                <div class="budget-item">
+                    <span>🏨 Goa (2 nights)</span>
+                    <span>₹10,000</span>
+                </div>
+                <div class="budget-item">
+                    <span>🍽️ Food (5 days)</span>
+                    <span>₹8,000</span>
+                </div>
+                <div class="budget-item">
+                    <span>🎢 Activities</span>
+                    <span>₹1,000</span>
+                </div>
+                <div class="budget-item">
+                    <span>🛍️ Misc</span>
+                    <span>₹2,000</span>
+                </div>
+                <div class="budget-item budget-total">
+                    <span>TOTAL</span>
+                    <span>₹36,000-40,000</span>
+                </div>
+            </div>
+
+            <!-- Checklist -->
+            <div class="checklist">
+                <h3>✅ Packing Checklist</h3>
+                <div class="check-item">
+                    <input type="checkbox" id="c1"><label for="c1">Driving license, RC, Insurance</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c2"><label for="c2">Cash + Cards</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c3"><label for="c3">Phone chargers, Power bank</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c4"><label for="c4">Light clothes (beaches!)</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c5"><label for="c5">Sunscreen, Sunglasses, Hat</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c6"><label for="c6">Camera</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c7"><label for="c7">Medicines, First aid</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c8"><label for="c8">Snacks & Water</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c9"><label for="c9">Bluetooth Speaker</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let markers = [];
+        let directionsService;
+        let directionsRenderer;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 13.5, lng: 75.5 },
+                zoom: 7,
+                styles: [
+                    { elementType: "geometry", stylers: [{ color: "#1d2c4d" }] },
+                    { elementType: "labels.text.fill", stylers: [{ color: "#8ec3b9" }] },
+                    { elementType: "labels.text.stroke", stylers: [{ color: "#1a3646" }] },
+                    { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#0e1626" }] },
+                    { featureType: "road", elementType: "geometry", stylers: [{ color: "#304a7d" }] },
+                ]
+            });
+
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: true,
+                polylineOptions: {
+                    strokeColor: '#667eea',
+                    strokeWeight: 4
+                }
+            });
+
+            // Add route
+            showFullRoute();
+
+            // Add markers for all waypoints
+            addWaypoints();
+
+            // Timeline item click handlers
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const lat = parseFloat(item.dataset.lat);
+                    const lng = parseFloat(item.dataset.lng);
+                    const title = item.dataset.title;
+                    
+                    if (lat && lng) {
+                        map.panTo({ lat, lng });
+                        map.setZoom(14);
+                        
+                        // Highlight active item
+                        document.querySelectorAll('.timeline-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            // Checklist handlers
+            document.querySelectorAll('.check-item input').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    e.target.parentElement.classList.toggle('checked', e.target.checked);
+                    localStorage.setItem(e.target.id, e.target.checked);
+                });
+                
+                // Restore state
+                const saved = localStorage.getItem(checkbox.id);
+                if (saved === 'true') {
+                    checkbox.checked = true;
+                    checkbox.parentElement.classList.add('checked');
+                }
+            });
+        }
+
+        function showFullRoute() {
+            const waypoints = [
+                { location: "Mangalore, Karnataka" },
+                { location: "Gokarna, Karnataka" },
+            ];
+
+            directionsService.route({
+                origin: "Coimbatore, Tamil Nadu",
+                destination: "Coimbatore, Tamil Nadu",
+                waypoints: [
+                    { location: "Mangalore, Karnataka", stopover: true },
+                    { location: "Goa, India", stopover: true },
+                ],
+                travelMode: google.maps.TravelMode.DRIVING
+            }, (result, status) => {
+                if (status === "OK") {
+                    directionsRenderer.setDirections(result);
+                }
+            });
+        }
+
+        function addWaypoints() {
+            const locations = [
+                { lat: 11.0168, lng: 76.9558, title: "Coimbatore", icon: "🏠", day: 1 },
+                { lat: 12.8698, lng: 74.8430, title: "Mangalore", icon: "🏨", day: 2 },
+                { lat: 14.5479, lng: 74.3188, title: "Gokarna", icon: "🏖️", day: 3 },
+                { lat: 15.6130, lng: 73.7496, title: "Goa", icon: "🎉", day: 3 },
+            ];
+
+            locations.forEach(loc => {
+                const marker = new google.maps.Marker({
+                    position: { lat: loc.lat, lng: loc.lng },
+                    map: map,
+                    title: loc.title,
+                    label: {
+                        text: loc.icon,
+                        fontSize: "24px"
+                    }
+                });
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<div class="info-window"><h4>${loc.icon} ${loc.title}</h4><p>Day ${loc.day}</p></div>`
+                });
+
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+
+                markers.push(marker);
+            });
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7R2B6AtIvPySj3QWUk_SO0_bpwZkLZAo&callback=initMap"></script>
+</body>
+</html>
